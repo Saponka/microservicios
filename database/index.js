@@ -1,5 +1,5 @@
 const server = require("./src/server");
-const {PORT} = require('./src/config/envs')
+//const {PORT} = require('./src/config/envs')
 
 //const { Character,Film,Planet}= require('../database/src/database/index');
 
@@ -13,5 +13,5 @@ gender: "male"
  */
 
 server.listen(PORT,()=>{
-    console.log(`Server Running in Port:${PORT}` );
+    console.log(`Server Running in Port:8004` );
 });
