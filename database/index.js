@@ -12,6 +12,6 @@ gender: "male"
 }).then((res)=> console.log(res));
  */
 
-server.listen(PORT,()=>{
-    console.log(`Server Running in Port:8004` );
+server.listen(8004,()=>{
+    console.log('Server Running in Port:',8004 );
 });
