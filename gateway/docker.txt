@@ -1,0 +1,117 @@
+Dockerfile es donde esta la configuracion de docker
+de como tiene que armar la img que luego se va a levantar como un contenedor
+para eso le indicamos la base de donde partimos.
+----------------------------------------------------------------------------------
+1-Usando el comando: FROM node:16 
+-Trae la imagen de node en la version 16 (la mas estable)
+
+FROM node:16 
+
+------------------------------------------------------------------------------------
+2-Donde se crea el directorio en Linux
+llamado por defecto app
+comando: WORKDIR /<ruta>
+
+WORKDIR /app
+
+------------------------------------------------------------------------------------
+3-Copia el archivo package.json, package-lock.json 
+ en el directorio /app
+comando: COPY <archivo> ./<ruta> 
+* para que incluya todos los archivos del tipo package.
+
+COPY package*.json ./ 
+
+-------------------------------------------------------------------------------------
+4-Ejecuta npm install = instala las dependencias dentro del contenedor.
+comando: RUN
+
+RUN npm install
+
+-------------------------------------------------------------------------------------
+5-Copia todos los archivos en el directorio actual /app
+comando COPY . .
+
+COPY . . 
+
+--------------------------------------------------------------------------------------
+6- Puerto que se expone(<port> = number).
+comando: EXPOSE <port> 
+
+EXPOSE 8000
+
+---------------------------------------------------------------------------------------
+7- Configuracion de start. 
+comando: CMD = comando
+
+CMD ["npm","start"]
+
+----------------------------------------------------------------------------------------
+*- Se crea como buena practica un archivo .dockerignore con node_modules y npm-debug.log
+-----------------------------------------------------------------------------------------
+8- Crear una Red en docker para la comunicacion de los contenedores con el gateway
+comando: docker network create <nombre>
+
+docker network create starwars
+
+Por consola devuelve un ID. 
+Crear la red parado en la carpeta que contiene a todos los microservices. 
+ej: D:\Programacion\Cursos\StarWarsApi-upskilling\api-microservices> docker network create starwars
+--------------------------------
+Luego hay que indicar la comunicacion. 
+
+El gateway se kiere comunicar con la red starwars
+para dirigirse al puerto del contenedor donde corre el servicio characters. 
+El gateway ante una peticion a "/characters" 
+quiere redirijir esta peticion al puerto 8001 del contendor, 
+que se va a conectar a la red con el nombre characters ej:"http://characters:8001"
+"Tener estos cambios en el archivo index.js de la carpeta gateway"
+----------------------------------------------------------------------------------------------
+
+9-Para crear la img desde la consola de gateway escribir el comando docker build -t <nombre> .
+
+El . referencia a donde se encuentra el archivo Dockerfile
+En consola si estamos en la carpeta de gateway seria un .
+
+   docker build -t gateway .
+
+-------------------------------------
+10- comando docker run // flag -p = port
+
+Port del contenedor que queremos que escuche, el port de nuestra pc.
+
+port izq pc 8000 : 8000 port der contenedor y un <nombre> de la imgen.
+
+docker run -p 8000:8000 gateway
+
+hacer el run con:
+--network donde se van a conectar el contendor.
+--name=<nombre> del servicio.
+
+docker run --network=starwars --name=gateway -p 8000:8000 gateway
+
+docker run --network=starwars --name=characters -p 8001:8001 characters
+docker run --network=starwars --name=planets -p 8001:8001 planets
+docker run --network=starwars --name=films -p 8001:8001 films
+
+------------------------------------------------------------------------
+Ahora los contenedores gateway y characters 
+estan conectados a una misma red exponiendo sus puertos y
+con un name en cual se identifican entre ellos para hacerce peticiones.
+Al hacer una peticion a nuestro gateway con su port=8000 expuesto en la pc
+a /characters lo redirije por proxy al port=8001 del contenedor characters.
+
+----------------------------------------------------------------------------
+todavia se puede enviar peticiones a sus diferentes localhost:8001/characters
+DockerCompose ayuda con esto
+
+--------------------------------------------------------------------------
+*- Cada cambio en el codigo despues del primer build
+1- Siempre re-buildaer la img
+2-parar el servicio de docker extension
+3- remover el contenedor 
+4-remover la imagen
+5-docker build -t gateway .
+6-docker build -t characters .
+
+
