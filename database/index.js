@@ -2,7 +2,7 @@ const server = require("./src/server");
 const {PORT} = require('./src/config/envs')
 
 //const { Character,Film,Planet}= require('../database/src/database/index');
-//Character.list().then((res)=> console.log(res));
+
 
 /* Character.insert({
 _id:"101",
